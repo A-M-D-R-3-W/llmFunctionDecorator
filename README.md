@@ -2,7 +2,7 @@
 
 A Python package designed to simplify the process of creating and managing function calls to OpenAI's API, as well as models using LiteLLM's API framework.
 
-![Demo_llmFunctionWrapper](https://github.com/A-M-D-R-3-W/llmFunctionWrapper/assets/84816543/a7c0f6d8-9bbc-4ea4-a09d-9c709beed7fd)
+![Demo_llmFunctionDecorator](https://github.com/A-M-D-R-3-W/llmFunctionDecorator/assets/84816543/a7c0f6d8-9bbc-4ea4-a09d-9c709beed7fd)
 
 ## Examples
 
@@ -10,16 +10,16 @@ Examples (A separate readme and project files) are located in the `examples/` fo
 
 ## Installation
 
-`llmFunctionWrapper` is available on PyPi, so installation is easy.
+`llmFunctionDecorator` is available on PyPi, so installation is easy.
 
 ```python
-pip install llmFunctionWrapper
+pip install llmFunctionDecorator
 ```
 
 Upon installation, make sure to import the package into your project.
 
 ```python
-from llmFunctionWrapper import ToolWrapper, FunctionRegistry
+from llmFunctionDecorator import tool, FunctionRegistry
 ```
 
 Note: Not required, but I also recommend using `print` from [Rich](https://github.com/Textualize/rich) for nice JSON formatting among other things. Rich is used in the attached example.
@@ -40,14 +40,13 @@ def an_awesome_function(variable1, variable2="A default value for variable2"):
     return desiredVariable
 ```
 
-### 2. Wrapping your Functions
+### 2. Decorating your Functions
 
-Use the `ToolWrapper` class to create your function descriptions which will be passed to the LLM. Add relevant details such as purpose, parameters, and descriptions.
+Use the `@tool` decorator to create your function descriptions which will be passed to the LLM. Add relevant details such as purpose, parameters, and descriptions. Make sure the decorator is ***directly above*** your function as shown.
 
 The description will look something like this:
 ```python
-awesomeFunction = ToolWrapper(
-    function_ref=an_awesome_function,
+@tool(
     purpose="An awesome function that does something amazing.",
     variable1=int,
     variable1_description="The first variable that will be used to do some awesome thing.",
@@ -55,6 +54,9 @@ awesomeFunction = ToolWrapper(
     variable2_description="The second variable that will be used to do another awesome thing.",
     required=["variable1", "variable2"]
 )
+def an_awesome_function(variable1, variable2="A default value for variable2"):
+    # Function body ...
+    return desiredVariable
 ```
 
 ### 3. Submitting Your Functions to the API
