@@ -166,16 +166,77 @@ For example,
 Enums can also have various data types. For example,
 - variable1=`[15, 17.2, "hello", True]`
 
+
 ## FunctionRegistry
 
-The `FunctionRegistry` class serves as a central repository for all functions that can be called by the LLM. It ensures that functions are uniquely identified by their names and can be invoked dynamically with arguments specified at runtime.
+The `FunctionRegistry` class acts as a storage and management system for all registered functions, enabling the dynamic invocation of these functions with arguments specified at runtime.
 
-***Note: This class may not be needed - I might be missing a simpler implementation.***
+### Overview
 
-### Key Methods
+The `FunctionRegistry` provides several class methods for managing functions, their metadata, and invocation:
 
-- `register_function(name, function)`: Registers a function under a given name. This will never* need to be called directly as it is automatically handled by the `ToolWrapper` class.
-- `get_registry()`: Returns the current registry of functions.
-- `call_function(name, **kwargs)`: Calls a registered function by name, passing keyword arguments.
+- `register_function(name, tool_instance)`: Automatically called by the `ToolWrapper` when a function is decorated with `@tool`. It registers a function with its metadata in the registry. This will never* need to be called directly as it is automatically handled.
+  
+- `get_registry()`: Returns a dictionary of all enabled function instances that are registered. Useful for inspecting which functions are available for invocation.
+  
+- `tools()`: Retrieves registered `ToolWrapper` instances, converts them to their dictionary representations, and returns a list of these dictionaries. This is the method you will pass to the `tools` key when creating your response, i.e., this will replace the JSON in your API call.
+  
+- `registry_status()`: Returns a string summary of all registered functions along with their enabled status. This is helpful for debugging purposes to ensure that the intended functions are enabled and correctly registered.
+  
+- `call_function(name, **kwargs)`: Tries to invoke a registered function by its name, passing the provided keyword arguments. I.e., it dynamically invokes functions based on LLM requests. See the **Parallel Function Call** example to see it in action, and understand how to implement it.
 
-An example of the `FuctionRegistry` class is provided in the **Parallel Function Call** example.
+### Usage
+
+Although most interaction with `FunctionRegistry` is automated through the use of the `@tool` decorator, a few of these methods can be very useful, especially for debugging or extending the capabilities of your LLM integration. Here are some examples:
+
+**Checking Registered Functions:**
+
+```python
+from llmFunctionDecorator import FunctionRegistry
+
+# List all registered functions and their enabled statuses
+print(FunctionRegistry.registry_status())
+```
+
+**Directly Invoking a Registered Function:**
+
+This example demonstrates how you might directly invoke a function that has been registered with the FunctionRegistry. 
+
+```python
+result = FunctionRegistry.call_function('get_current_weather', location="Tokyo, Japan")
+print(result)
+```
+
+This would attempt to call the `get_current_weather` function (assuming it's registered and enabled) with the specified location parameter. As you'll see in the **Parallel Function Call** example, this is handled by the LLM and will not require manual entry.
+
+**Listing Functions for LLM Integration:**
+
+When preparing a request to an LLM, you will need to include the list of functions. Here's how you can retrieve this list in the format expected by the LLM:
+
+```python
+from llmFunctionDecorator import FunctionRegistry
+
+tools_list = FunctionRegistry.tools()
+if tools_list:
+    response = litellm.completion(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        tools=tools_list,
+        tool_choice=FunctionRegistry.tool_choice(),
+    )
+```
+
+This snippet retrieves the list of registered and enabled function tools, passing it along to the LLM as part of the completion request.
+
+The `FunctionRegistry.tool_choice()` has 3 possible states:
+1. If there are no functions in the registry (or all functions are disabled), `tool_choice()` will return `None`, telling the LLM that there are no functions to call and it should continue the conversation.
+2. If there is at least 1 function in the registry (and it's enabled), `tool_choice()` will return `"auto"`, telling the LLM to decide if a function call is needed depending on the user's message.
+3. If you want to force a function call to a particular function, you can pass the function as an input.
+   I.e., `FunctionRegistry.tool_choice(get_current_weather)` will return `{'type': 'function', 'function': {'name': 'get_current_time'}}`, forcing the LLM to call that function.
+   Note: Make sure you are passing the actual function, not contained in a string. This only accepts a single function that is present in the registry and enabled.
+
+### Best Practices
+
+- Regularly use `registry_status()` during development to verify that your functions are correctly registered and in the state (enabled/disabled) you expect.
+- Utilize direct invocation with `call_function()` for testing your functions within the Python environment before integrating with LLM.
+- Keep your registered functions' interfaces simple and consistent to ensure smooth dynamic invocation by the LLM.
