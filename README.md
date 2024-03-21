@@ -93,17 +93,18 @@ else:
 
 This will maintain your access to `tool_choice` if there are functions enabled, and if there are no functions, it will use the second response format.
 
-## Detailed Look at Creating Your ToolWrapper() Function Descriptions
+## Detailed Look at Creating Your `@tool` Decorator Function Descriptions
 
 ### Required and Optional Parameters:
-- `function_ref` (Required, `callable`): The actual Python function that this wrapper is meant to represent, and which will be called by the LLM. This parameter must be a callable object (e.g., a function or a method).
-  ```python
-  function_ref=get_current_weather
-  ```
 
 - `purpose` (Required, `str`): A brief description of what the wrapped function does. This should be a human-readable string that clearly communicates the function's purpose.
   ```python
   purpose="Get the current weather in a given location"
+  ```
+  
+- `enabled` (Optional, `bool`): Flag indicating if the function is enabled. If not present, will default to `True`.
+  ```python
+  enabled=False
   ```
   
 - `required` (Optional, `list` of `str`): A list of parameter names that are required for the function to operate. This is useful for specifying which parameters cannot be omitted when calling the function.
