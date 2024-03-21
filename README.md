@@ -62,24 +62,36 @@ def an_awesome_function(variable1, variable2="A default value for variable2"):
 
 ### 3. Submitting Your Functions to the API
 
-Before you make your API request, you must serialize your function descriptions in OpenAI and LiteLLM's tool format.
-```python
-unserializedTools = [awesomeFunction] # If you have multiple functions, their descriptions must all be listed here (If you want to use them). Ex. unserializedTools = [awesomeFunction, otherFunction]
-tools = [tool.to_dict() for tool in unserializedTools]
-```
-Alternatively, you can serialize each function individually in-line:
-```python
-tools = [awesomeFunction.to_dict(), otherFunction.to_dict()]
-```
-After serializing, submit your `tools` list in your request, in the same way as before.
+Using the functions is very simple. In your request, under the `tools` key, set it to `FunctionRegistry.tools()`.
+
 ```python
 response = litellm.completion(
             model="gpt-3.5-turbo-1106",
             messages=messages,
-            tools=tools,
-            tool_choice="auto",
+            tools=FunctionRegistry.tools(),
 )
 ```
+
+Note: As `FunctionRegistry.tools()` returns `None` if there are no functions enabled, you must omit the `tool_choice` key, otherwise it will cause errors. 
+Alternatively, if you'd like to still access the `tool_choice` key, you can format your response as below:
+
+```python
+if FunctionRegistry.tools():
+    response = litellm.completion(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+        tools=FunctionRegistry.tools(),
+        tool_choice="auto",
+    )
+else:
+    response = litellm.completion(
+        model="gpt-3.5-turbo-1106",
+        messages=messages,
+    )
+)
+```
+
+This will maintain your access to `tool_choice` if there are functions enabled, and if there are no functions, it will use the second response format.
 
 ## Detailed Look at Creating Your ToolWrapper() Function Descriptions
 
