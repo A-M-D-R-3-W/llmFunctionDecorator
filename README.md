@@ -1,4 +1,4 @@
-# llmFunctionWrapper
+# llmFunctionDecorator
 
 A Python package designed to simplify the process of creating and managing function calls to OpenAI's API, as well as models using LiteLLM's API framework.
 
