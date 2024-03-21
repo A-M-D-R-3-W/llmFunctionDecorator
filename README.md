@@ -47,6 +47,7 @@ Use the `@tool` decorator to create your function descriptions which will be pas
 The description will look something like this:
 ```python
 @tool(
+    enabled=True,
     purpose="An awesome function that does something amazing.",
     variable1=int,
     variable1_description="The first variable that will be used to do some awesome thing.",
