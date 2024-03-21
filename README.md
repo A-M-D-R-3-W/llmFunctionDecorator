@@ -63,6 +63,7 @@ def an_awesome_function(variable1, variable2="A default value for variable2"):
 ### 3. Submitting Your Functions to the API
 
 Using the functions is very simple. In your request, under the `tools` key, set it to `FunctionRegistry.tools()`.
+
 Also, if you want to use the `tool_choice` key, set it to `FunctionRegistry.tool_choice()`. More information on `FunctionRegistry.tool_choice()` is provided in the ***FunctionRegistry Class*** in this readme.
 
 ```python
@@ -74,8 +75,7 @@ response = litellm.completion(
 )
 ```
 
-Note: As `FunctionRegistry.tools()` returns `None` if there are no functions enabled, you must omit the `tool_choice` key, otherwise it will cause errors. 
-Alternatively, if you'd like to still access the `tool_choice` key, you can format your response as below:
+Note: If you want to avoid using `FunctionRegistry.tool_choice()` and would rather manually input values for `tool_choice`, you will need to format your response as below, otherwise it will cause errors.
 
 ```python
 if FunctionRegistry.tools():
