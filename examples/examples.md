@@ -57,18 +57,27 @@ tool_calls = response.choices[0].message.tool_calls
 ```
 
 
-Modified for use with llmFunctionWrapper:
+Modified for use with llmFunctionDecorator:
 
 ```python
 import litellm
 import json
 import os
-from llmFunctionWrapper import ToolWrapper
+from llmFunctionDecorator import tool, FunctionRegistry
 
 # set openai api key
 os.environ['OPENAI_API_KEY'] = "" # litellm reads OPENAI_API_KEY from .env and sends the request
 # Example dummy function hard coded to return the same weather
 # In production, this could be your backend API or an external API
+
+@tool(
+    purpose="Get the current weather in a given location.",
+    location=str,
+    location_description="The city and state, e.g. San Francisco, CA",
+    unit=["celsius", "fahrenheit"],
+    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
+    required=["location"],
+)
 def get_current_weather(location, unit="fahrenheit"):
     """Get the current weather in a given location"""
     if "tokyo" in location.lower():
@@ -80,26 +89,14 @@ def get_current_weather(location, unit="fahrenheit"):
     else:
         return json.dumps({"location": location, "temperature": "unknown"})
 
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,
-    purpose="Get the current weather in a given location.",
-    location=str,
-    location_description="The city and state, e.g. San Francisco, CA",
-    unit=["celsius", "fahrenheit"],
-    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
-    required=["location"],
-)
 
 messages = [{"role": "user", "content": "What's the weather like in San Francisco, Tokyo, and Paris?"}]
-
-unserializedTools = [weatherFunction]
-tools = [tool.to_dict() for tool in unserializedTools]
 
 response = litellm.completion(
     model="gpt-3.5-turbo-1106",
     messages=messages,
-    tools=tools,
-    tool_choice="auto",  # auto is default, but we'll be explicit
+    tools=FunctionRegistry.tools(),
+    tool_choice=FunctionRegistry.tool_choice(),
 )
 print("\nLLM Response1:\n", response)
 response_message = response.choices[0].message
@@ -110,8 +107,7 @@ tool_calls = response.choices[0].message.tool_calls
 Note that
 
 ```python
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,
+@tool(
     purpose="Get the current weather in a given location.",
     location=str,
     location_description="The city and state, e.g. San Francisco, CA",
@@ -119,9 +115,7 @@ weatherFunction = ToolWrapper(
     unit_description="The unit of temperature, e.g. celsius or fahrenheit",
     required=["location"],
 )
-
-unserializedTools = [weatherFunction]
-tools = [tool.to_dict() for tool in unserializedTools]
+def function...
 ```
 
 Is a direct replacement for, and is identical to
