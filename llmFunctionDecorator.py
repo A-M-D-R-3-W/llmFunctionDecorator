@@ -54,6 +54,52 @@ class FunctionRegistry:
         return "\n".join(registry_entries)
 
     @classmethod
+    def tools(cls):
+        """
+        Retrieve registered ToolWrapper instances and convert to their dictionary representations.
+        This is what is sent to the model as the tools parameter.
+        :return: List of dictionaries representing each registered ToolWrapper instance. None if no tools are registered.
+        """
+        # Retrieve registered ToolWrapper instances directly
+        registered_tools = cls.get_registry().values()
+        # Convert each ToolWrapper instance to its dictionary representation
+        tools = [tool.to_dict() for tool in registered_tools]
+        return tools if tools else None
+
+    @classmethod
+    def tool_choice(cls, function_ref=None):
+        """
+        Generates a tool choice specification based on the function reference provided,
+        or the state of the function registry if no function reference is provided.
+        - Returns "auto" if the registry has one or more enabled functions and no function_ref is provided.
+        - Returns None if the registry is empty and no function_ref is provided.
+        - Ensures the function is both registered and enabled when a reference is provided.
+
+        :param function_ref: Reference to the function for which tool choice specification is generated. Optional.
+        :return: "auto", None, or a dictionary specifying the function for tool choice.
+        :raises: ValueError if function_ref is provided but not callable, not registered, or not enabled.
+        """
+        if function_ref is None:
+            # Check if registry has enabled functions; decide "auto" or None
+            return "auto" if any(info["enabled"] for info in cls._registry.values()) else None
+        else:
+            if not callable(function_ref):
+                raise ValueError("The provided function_ref is not callable. Please provide a valid function.")
+
+            function_name = function_ref.__name__
+            # Check if the function is registered and enabled
+            if function_name in cls._registry and cls._registry[function_name]["enabled"]:
+                return {
+                    "type": "function",
+                    "function": {
+                        "name": function_name
+                    }
+                }
+            else:
+                raise ValueError(
+                    f"The function '{function_name}' is either not registered in the FunctionRegistry or is disabled.")
+
+    @classmethod
     def call_function(cls, name, **kwargs):
         """
         Attempts to call a registered function by name with provided arguments.
