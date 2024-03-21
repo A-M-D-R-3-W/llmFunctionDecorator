@@ -3,13 +3,22 @@
 import litellm
 import json
 import os
-from llmFunctionWrapper import ToolWrapper, FunctionRegistry
+from llmFunctionDecorator import tool, FunctionRegistry
 from rich import print
 
 # set openai api key
-os.environ['OPENAI_API_KEY'] = "" # litellm reads OPENAI_API_KEY from .env and sends the request
+os.environ['OPENAI_API_KEY'] = "your API key here" # litellm reads OPENAI_API_KEY from .env and sends the request
 
 
+@tool(
+    enabled=True,                                                               # optional enabled argument
+    purpose="Get the current weather in a given location.",                     # description of the function
+    location=str,                                                               # type of the location argument
+    location_description="The city and state, e.g. San Francisco, CA",          # description of the location argument
+    unit=["celsius", "fahrenheit"],                                             # possible values for the unit argument
+    unit_description="The unit of temperature, e.g. celsius or fahrenheit",     # description of the unit argument
+    required=["location"],                                                      # required arguments
+)
 def get_current_weather(location, unit="fahrenheit"):
     """Get the current weather in a given location"""
     if "tokyo" in location.lower():
@@ -21,17 +30,14 @@ def get_current_weather(location, unit="fahrenheit"):
     else:
         return json.dumps({"location": location, "temperature": "unknown"})
 
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,                                           # function reference
-    purpose="Get the current weather in a given location.",                     # description of the function
+
+@tool(
+    enabled=True,                                                               # optional enabled argument
+    purpose="Get the current time in a given location.",                        # description of the function
     location=str,                                                               # type of the location argument
     location_description="The city and state, e.g. San Francisco, CA",          # description of the location argument
-    unit=["celsius", "fahrenheit"],                                             # possible values for the unit argument
-    unit_description="The unit of temperature, e.g. celsius or fahrenheit",     # description of the unit argument
     required=["location"],                                                      # required arguments
 )
-
-
 def get_current_time(location):
     """Get the current time in a given location"""
     if "tokyo" in location.lower():
@@ -43,34 +49,26 @@ def get_current_time(location):
     else:
         return "I don't know the time in " + location
 
-timeFunction = ToolWrapper(
-    function_ref= get_current_time,                                             # function reference
-    purpose="Get the current time in a given location.",                        # description of the function
-    location=str,                                                               # type of the location argument
-    location_description="The city and state, e.g. San Francisco, CA",          # description of the location argument
-    required=["location"],                                                      # required arguments
-)
-
 
 def test_parallel_function_call():
 
-    # This will print the list of functions in the registry
-    print("\nFunctions present in FunctionRegistry:", FunctionRegistry.get_registry())
+    # This will print the list of all callable (enabled) functions in the registry
+    print("\nCallable functions present in FunctionRegistry:", FunctionRegistry.get_registry())
+
+    # This will print all functions in the registry, including those that are disabled
+    print("\nAll functions in FunctionRegistry:\n", FunctionRegistry.registry_status())
 
     try:
         # Step 1: send the conversation and available functions to the model
         messages = [{"role": "user", "content": "What's the weather like in San Francisco, Tokyo, and Paris? Also, please tell me the time in San Francisco as well."}]
 
-        # Add the function descriptions to the tools list and serialize
-        unserializedTools = [weatherFunction, timeFunction]
-        tools = [tool.to_dict() for tool in unserializedTools]
-
         response = litellm.completion(
             model="gpt-3.5-turbo-1106",
             messages=messages,
-            tools=tools,
-            tool_choice="auto",  # auto is default, but we'll be explicit
+            tools=FunctionRegistry.tools(),                     # get the list of all enabled functions
+            tool_choice=FunctionRegistry.tool_choice(),         # since the registry contains callable functions, this will default to and return "auto"
         )
+
         print("\nFirst LLM Response:\n", response)
         response_message = response.choices[0].message
         tool_calls = response_message.tool_calls
