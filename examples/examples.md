@@ -296,7 +296,7 @@ def test_parallel_function_call():
 test_parallel_function_call()
 ```
 
-Modified for use with llmFunctionWrapper:
+Modified for use with llmFunctionDecorator:
 ```python
 import litellm
 import json
