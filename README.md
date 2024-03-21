@@ -113,7 +113,7 @@ This will maintain your access to `tool_choice` if there are functions enabled, 
   ```
 
 ### Parameter Keyword Arguments (Dynamic):
-- `**kwargs`: In addition to the parameters mentioned above, you can specify any number of additional keyword arguments. These are used to define the parameters (variables) that the function assigned to `function_ref` takes. The keys should be the names of the parameters, and the values should define their types or allowable values (for enums).
+- `**kwargs`: In addition to the parameters mentioned above, you can specify any number of additional keyword arguments. These are used to define the parameters (variables) that the decorated function takes as input. The keys should be the names of the parameters, and the values should define their types or allowable values (for enums).
   
   For each parameter of the function assigned to `function_ref`, you can provide:
   - The parameter type by simply specifying a Python type (e.g., `str`, `int`, etc.) as the value that the parameter expects as input.
