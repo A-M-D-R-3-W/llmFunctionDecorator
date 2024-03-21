@@ -133,8 +133,8 @@ This will maintain your access to `tool_choice` if there are functions enabled, 
 
     Putting this all together, we get our function description.
 ```python
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,                                           # function reference
+@tool(
+    enabled=True,                                                               # optional enabled argument
     purpose="Get the current weather in a given location.",                     # description of the function
     location=str,                                                               # type of the location argument
     location_description="The city and state, e.g. San Francisco, CA",          # description of the location argument
