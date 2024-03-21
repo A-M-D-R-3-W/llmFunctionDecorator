@@ -69,6 +69,7 @@ response = litellm.completion(
             model="gpt-3.5-turbo-1106",
             messages=messages,
             tools=FunctionRegistry.tools(),
+            tool_choice=FunctionRegistry.tool_choice(),
 )
 ```
 
