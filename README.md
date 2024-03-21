@@ -232,7 +232,7 @@ The `FunctionRegistry.tool_choice()` has 3 possible states:
 1. If there are no functions in the registry (or all functions are disabled), `tool_choice()` will return `None`, telling the LLM that there are no functions to call and it should continue the conversation.
 2. If there is at least 1 function in the registry (and it's enabled), `tool_choice()` will return `"auto"`, telling the LLM to decide if a function call is needed depending on the user's message.
 3. If you want to force a function call to a particular function, you can pass the function as an input.
-   I.e., `FunctionRegistry.tool_choice(get_current_weather)` will return `{'type': 'function', 'function': {'name': 'get_current_time'}}`, forcing the LLM to call that function.
+   I.e., `FunctionRegistry.tool_choice(get_current_weather)` will return `{'type': 'function', 'function': {'name': 'get_current_weather'}}`, forcing the LLM to call that function.
    Note: Make sure you are passing the actual function, not contained in a string. This only accepts a single function that is present in the registry and enabled.
 
 ### Best Practices
