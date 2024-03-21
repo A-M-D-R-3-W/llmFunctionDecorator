@@ -148,6 +148,14 @@ ___
 Let's say we want two functions - one to get the weather (from the example above), and one to get the time.
 
 ```python
+@tool(
+    purpose="Get the current weather in a given location.",
+    location=str,
+    location_description="The city and state, e.g. San Francisco, CA",
+    unit=["celsius", "fahrenheit"],
+    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
+    required=["location"],
+)
 def get_current_weather(location, unit="fahrenheit"):
     """Get the current weather in a given location"""
     if "tokyo" in location.lower():
@@ -159,16 +167,12 @@ def get_current_weather(location, unit="fahrenheit"):
     else:
         return json.dumps({"location": location, "temperature": "unknown"})
 
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,
-    purpose="Get the current weather in a given location.",
+@tool(
+    purpose="Get the current time in a given location.",
     location=str,
     location_description="The city and state, e.g. San Francisco, CA",
-    unit=["celsius", "fahrenheit"],
-    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
     required=["location"],
 )
-
 def get_current_time(location):
     """Get the current time in a given location"""
     if "tokyo" in location.lower():
@@ -180,23 +184,16 @@ def get_current_time(location):
     else:
         return "I don't know the time in " + location
 
-timeFunction = ToolWrapper(
-    function_ref= get_current_time,
-    purpose="Get the current time in a given location.",
-    location=str,
-    location_description="The city and state, e.g. San Francisco, CA",
-    required=["location"],
+.....
+
+response = litellm.completion(
+    model="gpt-3.5-turbo-1106",
+    messages=messages,
+    tools=FunctionRegistry.tools(),
+    tool_choice=FunctionRegistry.tool_choice(),
 )
-
-unserializedTools = [weatherFunction, timeFunction]
-tools = [tool.to_dict() for tool in unserializedTools]
 ```
-Notice that the only difference compared to calling a single function is adding **timeFunction** to the **unserializedTools** array.
-
-```python
-unserializedTools = [weatherFunction, timeFunction]
-tools = [tool.to_dict() for tool in unserializedTools]
-```
+Notice that there are no extra steps required for defining additional tools, other than creating the definition for the function using the decorator.
 
 ___
 ### Parallel Function Call
@@ -304,13 +301,22 @@ Modified for use with llmFunctionWrapper:
 import litellm
 import json
 import os
-from llmFunctionWrapper import ToolWrapper, FunctionRegistry
+from llmFunctionDecorator import tool, FunctionRegistry
 
 # set openai api key
 os.environ['OPENAI_API_KEY'] = "" # litellm reads OPENAI_API_KEY from .env and sends the request
 
 # Example dummy function hard coded to return the same weather
 # In production, this could be your backend API or an external API
+@tool(
+    enabled=True,
+    purpose="Get the current weather in a given location.",
+    location=str,
+    location_description="The city and state, e.g. San Francisco, CA",
+    unit=["celsius", "fahrenheit"],
+    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
+    required=["location"],
+)
 def get_current_weather(location, unit="fahrenheit"):
     """Get the current weather in a given location"""
     if "tokyo" in location.lower():
@@ -322,29 +328,17 @@ def get_current_weather(location, unit="fahrenheit"):
     else:
         return json.dumps({"location": location, "temperature": "unknown"})
 
-weatherFunction = ToolWrapper(
-    function_ref=get_current_weather,
-    purpose="Get the current weather in a given location.",
-    location=str,
-    location_description="The city and state, e.g. San Francisco, CA",
-    unit=["celsius", "fahrenheit"],
-    unit_description="The unit of temperature, e.g. celsius or fahrenheit",
-    required=["location"],
-)
 
 def test_parallel_function_call():
     try:
         # Step 1: send the conversation and available functions to the model
         messages = [{"role": "user", "content": "What's the weather like in San Francisco, Tokyo, and Paris?"}]
 
-        unserializedTools = [weatherFunction]
-        tools = [tool.to_dict() for tool in unserializedTools]
-
         response = litellm.completion(
             model="gpt-3.5-turbo-1106",
             messages=messages,
-            tools=tools,
-            tool_choice="auto",  # auto is default, but we'll be explicit
+            tools=FunctionRegistry.tools(),
+            tool_choice=FunctionRegistry.tool_choice(),
         )
         print("\nFirst LLM Response:\n", response)
         response_message = response.choices[0].message
@@ -388,7 +382,7 @@ test_parallel_function_call()
 ```
 There are a few changes that have occured.
 
-1. The function was defined using ToolWrapper(), exactly as was explained in the **Simple Single Function Call** example provided.
+1. The function was defined using `@tool`, exactly as was explained in the **Simple Single Function Call** example provided.
 2. The method for passing functions to call has changed as shown below:
 
 The original implementation
@@ -430,3 +424,4 @@ Has became
                     **function_args
                 )
 ```
+Notice that `FunctionRegistry.call_function()` is being used to perform the function call.
