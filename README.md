@@ -167,7 +167,7 @@ Enums can also have various data types. For example,
 - variable1=`[15, 17.2, "hello", True]`
 
 
-## FunctionRegistry
+## FunctionRegistry Class
 
 The `FunctionRegistry` class acts as a storage and management system for all registered functions, enabling the dynamic invocation of these functions with arguments specified at runtime.
 
