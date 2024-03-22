@@ -216,16 +216,14 @@ This would attempt to call the `get_current_weather` function (assuming it's reg
 When preparing a request to an LLM, you will need to include the list of functions. Here's how you can retrieve this list in the format expected by the LLM:
 
 ```python
-from llmFunctionDecorator import FunctionRegistry
+from llmFunctionDecorator import tool, FunctionRegistry
 
-tools_list = FunctionRegistry.tools()
-if tools_list:
-    response = litellm.completion(
-        model="gpt-3.5-turbo-1106",
-        messages=messages,
-        tools=tools_list,
-        tool_choice=FunctionRegistry.tool_choice(),
-    )
+response = litellm.completion(
+    model="gpt-3.5-turbo-1106",
+    messages=messages,
+    tools=FunctionRegistry.tools(),
+    tool_choice=FunctionRegistry.tool_choice(),
+)
 ```
 
 This snippet retrieves the list of registered and enabled function tools, passing it along to the LLM as part of the completion request.
