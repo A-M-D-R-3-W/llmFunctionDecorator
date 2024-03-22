@@ -3,7 +3,8 @@ https://pypi.org/project/llmFunctionDecorator
 
 A Python package designed to simplify the process of creating and managing function calls to OpenAI's API, as well as models using LiteLLM's API framework. Includes rigorous error handling.
 
-![Demo_llmFunctionDecorator](https://github.com/A-M-D-R-3-W/llmFunctionDecorator/assets/84816543/30dcccf5-8740-4cf2-ad4d-215d3fa8e49b)
+
+![Demo_llmFunctionDecorator](https://github.com/A-M-D-R-3-W/llmFunctionDecorator/assets/84816543/afa35889-81c7-4e5d-bdcd-1316a1778cc1)
 
 
 ## Examples
