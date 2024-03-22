@@ -2,7 +2,8 @@
 
 A Python package designed to simplify the process of creating and managing function calls to OpenAI's API, as well as models using LiteLLM's API framework.
 
-![Demo_llmFunctionDecorator](https://github.com/A-M-D-R-3-W/llmFunctionDecorator/assets/84816543/a7c0f6d8-9bbc-4ea4-a09d-9c709beed7fd)
+![Demo_llmFunctionDecorator](https://github.com/A-M-D-R-3-W/llmFunctionDecorator/assets/84816543/30dcccf5-8740-4cf2-ad4d-215d3fa8e49b)
+
 
 ## Examples
 
