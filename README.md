@@ -112,7 +112,7 @@ This will maintain your access to `tool_choice` if there are functions enabled, 
   enabled=False
   ```
   
-- `required` (Optional, `list` of `str`): A list of parameter names that are required for the function to operate. This is useful for specifying which parameters cannot be omitted when calling the function.
+- `required` (Optional, `list`): A list of parameter names that are required for the function to operate. This is useful for specifying which parameters cannot be omitted when calling the function.
   ```python
   required=["location", "unit"]
   ```
