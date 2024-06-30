@@ -18,8 +18,7 @@ os.environ['OPENAI_API_KEY'] = "YOUR OPENAI API KEY HERE"
 
 async def chat_loop():
     """
-    Main chat loop that handles user input, gets responses from the assistant,
-    and manages message history and tool calls.
+    Main chat loop that handles user input and gathers responses.
     """
 
     # Display callable functions and statuses from FunctionRegistry
