@@ -240,4 +240,3 @@ The `FunctionRegistry.tool_choice()` has 3 possible states:
 
 - Regularly use `registry_status()` during development to verify that your functions are correctly registered and in the state (enabled/disabled) you expect.
 - Utilize direct invocation with `call_function()` for testing your functions within the Python environment before integrating with LLM.
-- Keep your registered functions' interfaces simple and consistent to ensure smooth dynamic invocation by the LLM.
