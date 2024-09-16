@@ -45,7 +45,7 @@ def an_awesome_function(variable1, variable2="A default value for variable2"):
 
 ### 2. Decorating your Functions
 
-Use the `@tool` decorator to create your function descriptions which will be passed to the LLM. Add relevant details such as purpose, parameters, and descriptions. Make sure the decorator is ***directly above*** your function as shown.
+Use the `@tool` decorator to create your function descriptions which will be passed to the API. Add relevant details such as purpose, parameters, and descriptions. Make sure the decorator is ***directly above*** your function as shown.
 
 The description will look something like this:
 ```python
@@ -54,12 +54,12 @@ The description will look something like this:
     purpose="An awesome function that does something amazing.",
     variable1=int,
     variable1_description="The first variable that will be used to do some awesome thing.",
-    variable2=["option1", "option2"],
+    variable2=["option1", "option2"], # This is an enum of strings. A mix of any data type below is permissible.
     variable2_description="The second variable that will be used to do another awesome thing.",
     required=["variable1", "variable2"]
 )
 def an_awesome_function(variable1, variable2="A default value for variable2"):
-    # Function body ...
+    # ...
     return desiredVariable
 ```
 
@@ -78,7 +78,7 @@ response = litellm.completion(
 )
 ```
 
-Note: If you want to avoid using `FunctionRegistry.tool_choice()` and would rather manually input values for `tool_choice`, you will need to format your response as below, otherwise it will cause errors.
+Note: If you'd prefer to avoid using `FunctionRegistry.tool_choice()` and would rather manually input values for `tool_choice`, you will need to format your response as below, otherwise you will experience undefined behavior.
 
 ```python
 if FunctionRegistry.tools():
@@ -120,7 +120,7 @@ This will maintain your access to `tool_choice` if there are functions enabled, 
 ### Parameter Keyword Arguments (Dynamic):
 - `**kwargs`: In addition to the parameters mentioned above, you can specify any number of additional keyword arguments. These are used to define the parameters (variables) that the decorated function takes as input. The keys should be the names of the parameters, and the values should define their types or allowable values (for enums).
   
-  For each parameter of the function assigned to `function_ref`, you can provide:
+  For each parameter of the function, you can provide:
   - The parameter type by simply specifying a Python type (e.g., `str`, `int`, etc.) as the value that the parameter expects as input.
     ```python
     location=str
@@ -240,3 +240,8 @@ The `FunctionRegistry.tool_choice()` has 3 possible states:
 
 - Regularly use `registry_status()` during development to verify that your functions are correctly registered and in the state (enabled/disabled) you expect.
 - Utilize direct invocation with `call_function()` for testing your functions within the Python environment before integrating with LLM.
+
+### Development To Do
+
+- Set the default value of the `required` parameter in `@tool` decorator to be *all available variables*. This will align with most user's use-cases and simplify declaration.
+- Reduce decorator length by allowing type hinting in function declaration, and descriptions in docstring. This may cause issues with enum parameter types, and may be prone to reduced error handling.
