@@ -35,11 +35,11 @@ from rich import print
 
 ### 1. Defining Functions
 
-First, define your functions following standard Python syntax, in the same way OpenAI and LiteLLM expect. For example:
+First, define your functions following standard Python syntax. This function will be available to the API for use. For example:
 
 ```python
 def an_awesome_function(variable1, variable2="A default value for variable2"):
-    # Function body ...
+    # ...
     return desiredVariable
 ```
 
