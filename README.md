@@ -1,4 +1,4 @@
-### **Still functional as of 5/25/2025!**
+### **Custom tools are fully functional as of 5/25/2025, but built-in OpenAI tools (Web Search, Remote MCP Servers, File Search, Image Generation, Code Interpreter, Computer Use) do not yet have an improved implementation in this project. This does not affect LiteLLM users. On the to-do list!**
 # llmFunctionDecorator
 https://pypi.org/project/llmFunctionDecorator
 
