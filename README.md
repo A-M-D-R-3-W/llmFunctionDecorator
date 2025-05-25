@@ -1,3 +1,4 @@
+### **Still functional as of 5/25/2025!**
 # llmFunctionDecorator
 https://pypi.org/project/llmFunctionDecorator
 
